@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories(basePackages = "com.smartmarkethub.smart.repository")
 @EntityScan(basePackages = "com.smartmarkethub.smart.model")
 @ConfigurationPropertiesScan
+	
 public class SmartApplication {
 
 	public static void main(String[] args) {
