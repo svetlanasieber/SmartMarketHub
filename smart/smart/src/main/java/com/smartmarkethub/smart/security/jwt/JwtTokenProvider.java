@@ -25,10 +25,10 @@ public class JwtTokenProvider {
     public JwtTokenProvider(SecurityProperties securityProperties) {
         this.securityProperties = securityProperties;
         
-        // Generate a secure key from the secret
+        
         byte[] keyBytes = securityProperties.getJwt().getSecret().getBytes();
         if (keyBytes.length < 32) {
-            // If secret is too short, use a secure key generator
+           
             this.key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
             logger.warn("JWT secret was too short, generated a secure key instead");
         } else {
