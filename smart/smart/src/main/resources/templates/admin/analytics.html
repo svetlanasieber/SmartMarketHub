@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title id="pageTitle">Admin - Analytics</title>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="content">
+        <div class="container-fluid py-5">
+            <div class="row">
+                <!-- Admin Sidebar -->
+                <div class="col-lg-2">
+                    <div class="card shadow-sm mb-4">
+                        <div class="list-group list-group-flush">
+                            <a th:href="@{/admin}" class="list-group-item list-group-item-action">
+                                <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                            </a>
+                            <a th:href="@{/admin/products}" class="list-group-item list-group-item-action">
+                                <i class="bi bi-box me-2"></i>Products
+                            </a>
+                            <a th:href="@{/admin/categories}" class="list-group-item list-group-item-action">
+                                <i class="bi bi-tags me-2"></i>Categories
+                            </a>
+                            <a th:href="@{/admin/orders}" class="list-group-item list-group-item-action">
+                                <i class="bi bi-cart me-2"></i>Orders
+                            </a>
+                            <a th:href="@{/admin/users}" class="list-group-item list-group-item-action">
+                                <i class="bi bi-people me-2"></i>Users
+                            </a>
+                            <a th:href="@{/admin/analytics}" class="list-group-item list-group-item-action active">
+                                <i class="bi bi-graph-up me-2"></i>Analytics
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="col-lg-10">
+                    <!-- Time Range Filter -->
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-2">
+                                    <label for="timeRange" class="form-label">Time Range</label>
+                                    <select class="form-select" id="timeRange" onchange="updateAnalytics()">
+                                        <option value="7">Last 7 Days</option>
+                                        <option value="30">Last 30 Days</option>
+                                        <option value="90">Last 90 Days</option>
+                                        <option value="365">Last Year</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Custom Range</label>
+                                    <div class="input-group">
+                                        <input type="date" class="form-control" id="startDate">
+                                        <input type="date" class="form-control" id="endDate">
+                                        <button class="btn btn-primary" onclick="updateAnalytics()">Apply</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Key Metrics -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-3">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h6 class="text-muted mb-2">Total Revenue</h6>
+                                    <h3 class="mb-0" th:text="${'$' + metrics.totalRevenue}">$10,500</h3>
+                                    <div class="text-success small mt-2">
+                                        <i class="bi bi-arrow-up me-1"></i>
+                                        <span th:text="${metrics.revenueGrowth + '%'}">15%</span>
+                                        <span class="text-muted">vs previous period</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h6 class="text-muted mb-2">Orders</h6>
+                                    <h3 class="mb-0" th:text="${metrics.totalOrders}">150</h3>
+                                    <div class="text-success small mt-2">
+                                        <i class="bi bi-arrow-up me-1"></i>
+                                        <span th:text="${metrics.ordersGrowth + '%'}">8%</span>
+                                        <span class="text-muted">vs previous period</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h6 class="text-muted mb-2">Average Order Value</h6>
+                                    <h3 class="mb-0" th:text="${'$' + metrics.avgOrderValue}">$70</h3>
+                                    <div class="text-danger small mt-2">
+                                        <i class="bi bi-arrow-down me-1"></i>
+                                        <span th:text="${metrics.avgOrderValueGrowth + '%'}">3%</span>
+                                        <span class="text-muted">vs previous period</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h6 class="text-muted mb-2">Conversion Rate</h6>
+                                    <h3 class="mb-0" th:text="${metrics.conversionRate + '%'}">2.5%</h3>
+                                    <div class="text-success small mt-2">
+                                        <i class="bi bi-arrow-up me-1"></i>
+                                        <span th:text="${metrics.conversionRateGrowth + '%'}">5%</span>
+                                        <span class="text-muted">vs previous period</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Row 1 -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-8">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">Revenue & Orders Trend</h5>
+                                    <canvas id="revenueChart" height="300"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">Sales by Category</h5>
+                                    <canvas id="categoryChart" height="300"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Row 2 -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">Top Products</h5>
+                                    <canvas id="productsChart" height="300"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">Customer Acquisition</h5>
+                                    <canvas id="customersChart" height="300"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Analytics Tables -->
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">Top Selling Products</h5>
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Product</th>
+                                                    <th>Sales</th>
+                                                    <th>Revenue</th>
+                                                    <th>Growth</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr th:each="product : ${topProducts}">
+                                                    <td th:text="${product.name}">Product Name</td>
+                                                    <td th:text="${product.sales}">100</td>
+                                                    <td th:text="${'$' + product.revenue}">$1,000</td>
+                                                    <td>
+                                                        <span class="text-success" 
+                                                              th:text="${'+' + product.growth + '%'}"
+                                                              th:class="${product.growth >= 0 ? 'text-success' : 'text-danger'}">
+                                                            +15%
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">Customer Segments</h5>
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Segment</th>
+                                                    <th>Customers</th>
+                                                    <th>Orders</th>
+                                                    <th>Revenue</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr th:each="segment : ${customerSegments}">
+                                                    <td th:text="${segment.name}">New</td>
+                                                    <td th:text="${segment.customers}">50</td>
+                                                    <td th:text="${segment.orders}">75</td>
+                                                    <td th:text="${'$' + segment.revenue}">$500</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page Scripts -->
+    <th:block id="pageScripts">
+        <script th:inline="javascript">
+            const analyticsData = /*[[${analyticsData}]]*/ {};
+
+            // Revenue & Orders Chart
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: analyticsData.revenueDates,
+                    datasets: [{
+                        label: 'Revenue',
+                        data: analyticsData.revenueData,
+                        borderColor: '#2563eb',
+                        yAxisID: 'y',
+                        tension: 0.4
+                    }, {
+                        label: 'Orders',
+                        data: analyticsData.ordersData,
+                        borderColor: '#10b981',
+                        yAxisID: 'y1',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Revenue ($)'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Orders'
+                            },
+                            grid: {
+                                drawOnChartArea: false
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Category Chart
+            const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+            new Chart(categoryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: analyticsData.categoryLabels,
+                    datasets: [{
+                        data: analyticsData.categoryData,
+                        backgroundColor: [
+                            '#2563eb',
+                            '#10b981',
+                            '#f97316',
+                            '#8b5cf6',
+                            '#ec4899'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Top Products Chart
+            const productsCtx = document.getElementById('productsChart').getContext('2d');
+            new Chart(productsCtx, {
+                type: 'bar',
+                data: {
+                    labels: analyticsData.productLabels,
+                    datasets: [{
+                        label: 'Sales',
+                        data: analyticsData.productData,
+                        backgroundColor: '#2563eb'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Customer Acquisition Chart
+            const customersCtx = document.getElementById('customersChart').getContext('2d');
+            new Chart(customersCtx, {
+                type: 'line',
+                data: {
+                    labels: analyticsData.customerDates,
+                    datasets: [{
+                        label: 'New Customers',
+                        data: analyticsData.customerData,
+                        borderColor: '#2563eb',
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            function updateAnalytics() {
+                const timeRange = document.getElementById('timeRange').value;
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+
+                const params = new URLSearchParams();
+                if (timeRange !== '') {
+                    params.set('range', timeRange);
+                } else if (startDate && endDate) {
+                    params.set('start', startDate);
+                    params.set('end', endDate);
+                }
+
+                window.location.search = params.toString();
+            }
+
+            // Initialize date inputs with current date range
+            document.addEventListener('DOMContentLoaded', function() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const start = urlParams.get('start');
+                const end = urlParams.get('end');
+                const range = urlParams.get('range');
+
+                if (start && end) {
+                    document.getElementById('startDate').value = start;
+                    document.getElementById('endDate').value = end;
+                    document.getElementById('timeRange').value = '';
+                } else if (range) {
+                    document.getElementById('timeRange').value = range;
+                }
+            });
+        </script>
+    </th:block>
+</body>
+</html>

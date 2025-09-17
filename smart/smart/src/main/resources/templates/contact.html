@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title id="pageTitle">Contact Us</title>
+</head>
+<body>
+    <div id="content">
+        <!-- Hero Section -->
+        <section class="bg-primary text-white py-5">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-6">
+                        <h1 class="display-4 fw-bold mb-4">Get in Touch</h1>
+                        <p class="lead mb-0">Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
+                    </div>
+                    <div class="col-lg-6">
+                        <img src="/img/contact-illustration.svg" alt="Contact" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Information -->
+        <section class="py-5 bg-light">
+            <div class="container">
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="text-primary mb-3">
+                                    <i class="bi bi-geo-alt display-4"></i>
+                                </div>
+                                <h5 class="card-title">Visit Us</h5>
+                                <p class="card-text">
+                                    123 Market Street<br>
+                                    Suite 456<br>
+                                    City, State 12345
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="text-primary mb-3">
+                                    <i class="bi bi-telephone display-4"></i>
+                                </div>
+                                <h5 class="card-title">Call Us</h5>
+                                <p class="card-text">
+                                    <a href="tel:+1234567890" class="text-decoration-none">
+                                        +1 (234) 567-890
+                                    </a><br>
+                                    Monday - Friday<br>
+                                    9:00 AM - 5:00 PM
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="text-primary mb-3">
+                                    <i class="bi bi-envelope display-4"></i>
+                                </div>
+                                <h5 class="card-title">Email Us</h5>
+                                <p class="card-text">
+                                    <a href="mailto:info@smartmarkethub.com" class="text-decoration-none">
+                                        info@smartmarkethub.com
+                                    </a><br>
+                                    We'll respond within<br>
+                                    24 hours
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Form -->
+        <section class="py-5">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body p-5">
+                                <h2 class="text-center mb-4">Send Us a Message</h2>
+
+                                <!-- Alert Messages -->
+                                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                                    Your message has been sent successfully. We'll get back to you soon!
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    There was an error sending your message. Please try again.
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+
+                                <form th:action="@{/contact}" method="post" th:object="${contactForm}">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="firstName" class="form-label">First Name</label>
+                                            <input type="text" class="form-control" id="firstName" 
+                                                   th:field="*{firstName}" required>
+                                            <div class="invalid-feedback" 
+                                                 th:if="${#fields.hasErrors('firstName')}" 
+                                                 th:errors="*{firstName}">
+                                                First name error
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="lastName" class="form-label">Last Name</label>
+                                            <input type="text" class="form-control" id="lastName" 
+                                                   th:field="*{lastName}" required>
+                                            <div class="invalid-feedback" 
+                                                 th:if="${#fields.hasErrors('lastName')}" 
+                                                 th:errors="*{lastName}">
+                                                Last name error
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="email" 
+                                               th:field="*{email}" required>
+                                        <div class="invalid-feedback" 
+                                             th:if="${#fields.hasErrors('email')}" 
+                                             th:errors="*{email}">
+                                            Email error
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="subject" class="form-label">Subject</label>
+                                        <select class="form-select" id="subject" th:field="*{subject}" required>
+                                            <option value="">Select a subject</option>
+                                            <option value="GENERAL">General Inquiry</option>
+                                            <option value="SUPPORT">Technical Support</option>
+                                            <option value="SALES">Sales</option>
+                                            <option value="FEEDBACK">Feedback</option>
+                                            <option value="OTHER">Other</option>
+                                        </select>
+                                        <div class="invalid-feedback" 
+                                             th:if="${#fields.hasErrors('subject')}" 
+                                             th:errors="*{subject}">
+                                            Subject error
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="message" class="form-label">Message</label>
+                                        <textarea class="form-control" id="message" rows="5" 
+                                                  th:field="*{message}" required></textarea>
+                                        <div class="invalid-feedback" 
+                                             th:if="${#fields.hasErrors('message')}" 
+                                             th:errors="*{message}">
+                                            Message error
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3 form-check">
+                                        <input type="checkbox" class="form-check-input" id="newsletter" 
+                                               th:field="*{newsletter}">
+                                        <label class="form-check-label" for="newsletter">
+                                            Subscribe to our newsletter for updates and special offers
+                                        </label>
+                                    </div>
+
+                                    <div class="text-center">
+                                        <button type="submit" class="btn btn-primary btn-lg">
+                                            <i class="bi bi-send me-2"></i>Send Message
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="py-5 bg-light">
+            <div class="container">
+                <h2 class="text-center mb-5">Frequently Asked Questions</h2>
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="accordion" id="faqAccordion">
+                            <div class="accordion-item">
+                                <h3 class="accordion-header">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" 
+                                            data-bs-target="#faq1">
+                                        How can I track my order?
+                                    </button>
+                                </h3>
+                                <div id="faq1" class="accordion-collapse collapse show" 
+                                     data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        You can track your order by logging into your account and visiting the 
+                                        "My Orders" section. There you'll find detailed tracking information for 
+                                        all your orders.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h3 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" 
+                                            data-bs-toggle="collapse" data-bs-target="#faq2">
+                                        What is your return policy?
+                                    </button>
+                                </h3>
+                                <div id="faq2" class="accordion-collapse collapse" 
+                                     data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        We offer a 30-day return policy for most items. Products must be unused 
+                                        and in their original packaging. Please contact our support team to 
+                                        initiate a return.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h3 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" 
+                                            data-bs-toggle="collapse" data-bs-target="#faq3">
+                                        Do you ship internationally?
+                                    </button>
+                                </h3>
+                                <div id="faq3" class="accordion-collapse collapse" 
+                                     data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        Yes, we ship to most countries worldwide. Shipping costs and delivery 
+                                        times vary by location. You can see the exact shipping costs during 
+                                        checkout.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h3 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" 
+                                            data-bs-toggle="collapse" data-bs-target="#faq4">
+                                        How can I change or cancel my order?
+                                    </button>
+                                </h3>
+                                <div id="faq4" class="accordion-collapse collapse" 
+                                     data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        You can modify or cancel your order within 1 hour of placing it. After 
+                                        that, please contact our customer support team for assistance.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Map Section -->
+        <section class="py-5">
+            <div class="container">
+                <div class="ratio ratio-21x9">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12345.67890!2d-73.123456!3d40.123456!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zM40zIDEyLjM0NiIgTiA3M8KwIDEyLjM0NiIgVw!5e0!3m2!1sen!2sus!4v1234567890"
+                            style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

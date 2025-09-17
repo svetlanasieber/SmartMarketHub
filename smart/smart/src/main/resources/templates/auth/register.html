@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title id="pageTitle">Register</title>
+</head>
+<body>
+    <div id="content">
+        <div class="container py-5">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <div class="card shadow-sm">
+                        <div class="card-body p-5">
+                            <h1 class="text-center h3 mb-4">Create an Account</h1>
+
+                            <!-- Alert for validation errors -->
+                            <div th:if="${errors}" class="alert alert-danger" role="alert">
+                                <ul class="mb-0">
+                                    <li th:each="error : ${errors}" th:text="${error}"></li>
+                                </ul>
+                            </div>
+
+                            <form th:action="@{/register}" method="post" th:object="${registrationForm}">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="firstName" class="form-label">First Name</label>
+                                        <input type="text" class="form-control" id="firstName" 
+                                               th:field="*{firstName}" required>
+                                        <div class="invalid-feedback" 
+                                             th:if="${#fields.hasErrors('firstName')}" 
+                                             th:errors="*{firstName}">
+                                            First name error
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label for="lastName" class="form-label">Last Name</label>
+                                        <input type="text" class="form-control" id="lastName" 
+                                               th:field="*{lastName}" required>
+                                        <div class="invalid-feedback" 
+                                             th:if="${#fields.hasErrors('lastName')}" 
+                                             th:errors="*{lastName}">
+                                            Last name error
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="username" class="form-label">Username</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="bi bi-person"></i>
+                                        </span>
+                                        <input type="text" class="form-control" id="username" 
+                                               th:field="*{username}" required>
+                                    </div>
+                                    <div class="invalid-feedback" 
+                                         th:if="${#fields.hasErrors('username')}" 
+                                         th:errors="*{username}">
+                                        Username error
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="bi bi-envelope"></i>
+                                        </span>
+                                        <input type="email" class="form-control" id="email" 
+                                               th:field="*{email}" required>
+                                    </div>
+                                    <div class="invalid-feedback" 
+                                         th:if="${#fields.hasErrors('email')}" 
+                                         th:errors="*{email}">
+                                        Email error
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">Password</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="bi bi-lock"></i>
+                                        </span>
+                                        <input type="password" class="form-control" id="password" 
+                                               th:field="*{password}" required>
+                                    </div>
+                                    <div class="invalid-feedback" 
+                                         th:if="${#fields.hasErrors('password')}" 
+                                         th:errors="*{password}">
+                                        Password error
+                                    </div>
+                                    <small class="form-text text-muted">
+                                        Password must be at least 8 characters long and contain at least one uppercase letter,
+                                        one lowercase letter, one number, and one special character.
+                                    </small>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="confirmPassword" class="form-label">Confirm Password</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="bi bi-lock"></i>
+                                        </span>
+                                        <input type="password" class="form-control" id="confirmPassword" 
+                                               th:field="*{confirmPassword}" required>
+                                    </div>
+                                    <div class="invalid-feedback" 
+                                         th:if="${#fields.hasErrors('confirmPassword')}" 
+                                         th:errors="*{confirmPassword}">
+                                        Confirm password error
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="terms" 
+                                               th:field="*{terms}" required>
+                                        <label class="form-check-label" for="terms">
+                                            I agree to the <a href="#" class="text-primary">Terms of Service</a> and 
+                                            <a href="#" class="text-primary">Privacy Policy</a>
+                                        </label>
+                                        <div class="invalid-feedback" 
+                                             th:if="${#fields.hasErrors('terms')}" 
+                                             th:errors="*{terms}">
+                                            Terms error
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100 mb-3">
+                                    <i class="bi bi-person-plus me-2"></i>Create Account
+                                </button>
+                            </form>
+
+                            <div class="text-center">
+                                <p class="mb-0">Already have an account? 
+                                    <a th:href="@{/login}" class="text-primary">Login here</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title id="pageTitle">Admin Dashboard</title>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="content">
+        <div class="container-fluid py-5">
+            <div class="row">
+                <div class="col-md-2">
+                    <!-- Admin Sidebar -->
+                    <div class="card">
+                        <div class="card-body p-0">
+                            <div class="list-group list-group-flush">
+                                <a href="#" class="list-group-item list-group-item-action active">
+                                    <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                                </a>
+                                <a th:href="@{/admin/products}" class="list-group-item list-group-item-action">
+                                    <i class="bi bi-box me-2"></i>Products
+                                </a>
+                                <a th:href="@{/admin/categories}" class="list-group-item list-group-item-action">
+                                    <i class="bi bi-tags me-2"></i>Categories
+                                </a>
+                                <a th:href="@{/admin/orders}" class="list-group-item list-group-item-action">
+                                    <i class="bi bi-cart me-2"></i>Orders
+                                </a>
+                                <a th:href="@{/admin/users}" class="list-group-item list-group-item-action">
+                                    <i class="bi bi-people me-2"></i>Users
+                                </a>
+                                <a th:href="@{/admin/analytics}" class="list-group-item list-group-item-action">
+                                    <i class="bi bi-graph-up me-2"></i>Analytics
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-10">
+                    <!-- Stats Cards -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div>
+                                        <h6 class="text-muted mb-0">Total Sales</h6>
+                                        <h3 class="mb-0" th:text="${'$' + stats.totalSales}">$10,500</h3>
+                                    </div>
+                                    <div class="text-primary">
+                                        <i class="bi bi-currency-dollar display-6"></i>
+                                    </div>
+                                </div>
+                                <div class="text-success">
+                                    <i class="bi bi-arrow-up"></i>
+                                    <span th:text="${stats.salesGrowth + '%'}">15%</span>
+                                    <span class="text-muted">vs last month</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div>
+                                        <h6 class="text-muted mb-0">Orders</h6>
+                                        <h3 class="mb-0" th:text="${stats.totalOrders}">150</h3>
+                                    </div>
+                                    <div class="text-primary">
+                                        <i class="bi bi-cart display-6"></i>
+                                    </div>
+                                </div>
+                                <div class="text-success">
+                                    <i class="bi bi-arrow-up"></i>
+                                    <span th:text="${stats.ordersGrowth + '%'}">8%</span>
+                                    <span class="text-muted">vs last month</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div>
+                                        <h6 class="text-muted mb-0">Customers</h6>
+                                        <h3 class="mb-0" th:text="${stats.totalCustomers}">1,250</h3>
+                                    </div>
+                                    <div class="text-primary">
+                                        <i class="bi bi-people display-6"></i>
+                                    </div>
+                                </div>
+                                <div class="text-success">
+                                    <i class="bi bi-arrow-up"></i>
+                                    <span th:text="${stats.customersGrowth + '%'}">12%</span>
+                                    <span class="text-muted">vs last month</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div>
+                                        <h6 class="text-muted mb-0">Products</h6>
+                                        <h3 class="mb-0" th:text="${stats.totalProducts}">450</h3>
+                                    </div>
+                                    <div class="text-primary">
+                                        <i class="bi bi-box display-6"></i>
+                                    </div>
+                                </div>
+                                <div class="text-danger">
+                                    <i class="bi bi-arrow-down"></i>
+                                    <span>2%</span>
+                                    <span class="text-muted">vs last month</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Row -->
+                    <div class="row g-4 mb-4">
+                        <!-- Sales Chart -->
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Sales Overview</h5>
+                                    <canvas id="salesChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Top Categories Chart -->
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Top Categories</h5>
+                                    <canvas id="categoriesChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Orders Table -->
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h5 class="card-title mb-0">Recent Orders</h5>
+                                <a th:href="@{/admin/orders}" class="btn btn-sm btn-primary">View All</a>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Order ID</th>
+                                            <th>Customer</th>
+                                            <th>Products</th>
+                                            <th>Total</th>
+                                            <th>Status</th>
+                                            <th>Date</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="order : ${recentOrders}">
+                                            <td th:text="${'#' + order.id}">1</td>
+                                            <td th:text="${order.user.username}">John Doe</td>
+                                            <td th:text="${order.orderItems.size() + ' items'}">3 items</td>
+                                            <td th:text="${'$' + order.totalPrice}">$99.99</td>
+                                            <td>
+                                                <span class="badge" 
+                                                      th:classappend="${
+                                                          order.status == 'PENDING' ? 'bg-warning' :
+                                                          order.status == 'CONFIRMED' ? 'bg-info' :
+                                                          order.status == 'SHIPPED' ? 'bg-primary' :
+                                                          'bg-success'
+                                                      }"
+                                                      th:text="${order.status}">
+                                                    Status
+                                                </span>
+                                            </td>
+                                            <td th:text="${#temporals.format(order.createdOn, 'dd MMM yyyy')}">
+                                                01 Jan 2025
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <a th:href="@{/admin/orders/{id}(id=${order.id})}" 
+                                                       class="btn btn-outline-primary">
+                                                        <i class="bi bi-eye"></i>
+                                                    </a>
+                                                    <button type="button" class="btn btn-outline-success"
+                                                            th:data-order-id="${order.id}">
+                                                        <i class="bi bi-check2"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page Scripts -->
+    <th:block id="pageScripts">
+        <script th:inline="javascript">
+            // Sales Chart
+            const salesCtx = document.getElementById('salesChart').getContext('2d');
+            const salesData = /*[[${salesData}]]*/ {};
+            
+            new Chart(salesCtx, {
+                type: 'line',
+                data: {
+                    labels: salesData.labels,
+                    datasets: [{
+                        label: 'Sales',
+                        data: salesData.values,
+                        borderColor: '#2563eb',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Categories Chart
+            const categoriesCtx = document.getElementById('categoriesChart').getContext('2d');
+            const categoriesData = /*[[${categoriesData}]]*/ {};
+            
+            new Chart(categoriesCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: categoriesData.labels,
+                    datasets: [{
+                        data: categoriesData.values,
+                        backgroundColor: [
+                            '#2563eb',
+                            '#10b981',
+                            '#f97316',
+                            '#8b5cf6',
+                            '#ec4899'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        </script>
+    </th:block>
+</body>
+</html>

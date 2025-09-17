@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title id="pageTitle">Shopping Cart</title>
+</head>
+<body>
+    <div id="content">
+        <div class="container py-5">
+            <h1 class="h3 mb-4">Shopping Cart</h1>
+
+            <!-- Empty Cart Message -->
+            <div th:if="${#lists.isEmpty(cartItems)}" class="text-center py-5">
+                <i class="bi bi-cart-x display-1 text-muted mb-4"></i>
+                <h2 class="h4 mb-4">Your cart is empty</h2>
+                <p class="text-muted mb-4">Add some products to your cart and they will appear here</p>
+                <a th:href="@{/products}" class="btn btn-primary">
+                    <i class="bi bi-shop me-2"></i>Continue Shopping
+                </a>
+            </div>
+
+            <!-- Cart Items -->
+            <div th:unless="${#lists.isEmpty(cartItems)}" class="row">
+                <div class="col-lg-8">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <!-- Cart Items List -->
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Price</th>
+                                            <th>Quantity</th>
+                                            <th>Total</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="item : ${cartItems}">
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img th:src="${item.product.imageUrl}" 
+                                                         class="rounded me-3" 
+                                                         style="width: 64px; height: 64px; object-fit: cover;"
+                                                         th:alt="${item.product.name}">
+                                                    <div>
+                                                        <h6 class="mb-0" th:text="${item.product.name}">
+                                                            Product Name
+                                                        </h6>
+                                                        <small class="text-muted" 
+                                                               th:text="${item.product.category.name}">
+                                                            Category
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td th:text="${'$' + item.product.price}">$99.99</td>
+                                            <td style="width: 150px;">
+                                                <div class="input-group input-group-sm">
+                                                    <button class="btn btn-outline-secondary" type="button"
+                                                            th:onclick="'updateQuantity(' + ${item.product.id} + ', -1)'">
+                                                        <i class="bi bi-dash"></i>
+                                                    </button>
+                                                    <input type="number" class="form-control text-center" 
+                                                           th:value="${item.quantity}" min="1" 
+                                                           th:data-product-id="${item.product.id}"
+                                                           onchange="updateQuantityInput(this)">
+                                                    <button class="btn btn-outline-secondary" type="button"
+                                                            th:onclick="'updateQuantity(' + ${item.product.id} + ', 1)'">
+                                                        <i class="bi bi-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td th:text="${'$' + item.total}">$199.98</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-danger"
+                                                        th:onclick="'removeItem(' + ${item.product.id} + ')'">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Continue Shopping -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <a th:href="@{/products}" class="btn btn-outline-primary">
+                            <i class="bi bi-arrow-left me-2"></i>Continue Shopping
+                        </a>
+                        <button class="btn btn-outline-danger" onclick="clearCart()">
+                            <i class="bi bi-trash me-2"></i>Clear Cart
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="col-lg-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title mb-4">Order Summary</h5>
+                            
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Subtotal</span>
+                                <span th:text="${'$' + cart.subtotal}">$299.97</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Shipping</span>
+                                <span th:text="${cart.shipping > 0 ? '$' + cart.shipping : 'Free'}">Free</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Tax</span>
+                                <span th:text="${'$' + cart.tax}">$30.00</span>
+                            </div>
+                            
+                            <hr>
+                            
+                            <div class="d-flex justify-content-between mb-4">
+                                <strong>Total</strong>
+                                <strong class="text-primary" th:text="${'$' + cart.total}">$329.97</strong>
+                            </div>
+
+                            <!-- Promo Code -->
+                            <div class="mb-4">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Promo code"
+                                           id="promoCode">
+                                    <button class="btn btn-outline-primary" type="button" onclick="applyPromo()">
+                                        Apply
+                                    </button>
+                                </div>
+                            </div>
+
+                            <a th:href="@{/checkout}" class="btn btn-primary w-100">
+                                <i class="bi bi-credit-card me-2"></i>Proceed to Checkout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page Scripts -->
+    <th:block id="pageScripts">
+        <script th:inline="javascript">
+            function updateQuantity(productId, change) {
+                const input = document.querySelector(`input[data-product-id="${productId}"]`);
+                let newValue = parseInt(input.value) + change;
+                if (newValue < 1) newValue = 1;
+                input.value = newValue;
+                updateCart(productId, newValue);
+            }
+
+            function updateQuantityInput(input) {
+                const productId = input.getAttribute('data-product-id');
+                let value = parseInt(input.value);
+                if (value < 1) {
+                    value = 1;
+                    input.value = value;
+                }
+                updateCart(productId, value);
+            }
+
+            function updateCart(productId, quantity) {
+                fetch('/cart/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector("meta[name='_csrf']").content
+                    },
+                    body: JSON.stringify({
+                        productId: productId,
+                        quantity: quantity
+                    })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+
+            function removeItem(productId) {
+                if (confirm('Are you sure you want to remove this item?')) {
+                    fetch('/cart/remove', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector("meta[name='_csrf']").content
+                        },
+                        body: JSON.stringify({
+                            productId: productId
+                        })
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload();
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                }
+            }
+
+            function clearCart() {
+                if (confirm('Are you sure you want to clear your cart?')) {
+                    fetch('/cart/clear', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector("meta[name='_csrf']").content
+                        }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload();
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                }
+            }
+
+            function applyPromo() {
+                const promoCode = document.getElementById('promoCode').value;
+                fetch('/cart/promo', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector("meta[name='_csrf']").content
+                    },
+                    body: JSON.stringify({
+                        code: promoCode
+                    })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('Invalid promo code');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        </script>
+    </th:block>
+</body>
+</html>
