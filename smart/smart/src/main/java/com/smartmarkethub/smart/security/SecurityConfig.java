@@ -66,7 +66,7 @@ public class SecurityConfig {
         AuthenticationManager authenticationManager = authConfig.getAuthenticationManager();
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.disable())  // Временно изключваме CSRF
+            .csrf(csrf -> csrf.disable())  
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/", "/home", "/login", "/register",
@@ -76,7 +76,7 @@ public class SecurityConfig {
                     "/products/**", "/api/products/**", "/api/categories/**"
                 ).permitAll()
                 .requestMatchers("/api/admin/**", "/admin/**").hasRole("ADMIN")
-                .anyRequest().permitAll()  // Временно разрешаваме всички заявки
+                .anyRequest().permitAll()  
             )
             .formLogin(form -> form
                 .loginPage("/login")
@@ -87,7 +87,7 @@ public class SecurityConfig {
                 .logoutSuccessUrl("/")
                 .permitAll());
 
-        // Configure SSL if required
+       
         if (securityProperties.isRequireSsl()) {
             http.securityMatcher("/**")
                 .headers(headers -> headers
