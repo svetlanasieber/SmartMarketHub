@@ -86,16 +86,16 @@ public class CategoryService {
         
         Map<String, Object> stats = new HashMap<>();
         
-        // Total categories
+       
         stats.put("totalCategories", categories.size());
         
-        // Categories with products
+      
         long categoriesWithProducts = categories.stream()
                 .filter(c -> !c.getProducts().isEmpty())
                 .count();
         stats.put("categoriesWithProducts", categoriesWithProducts);
         
-        // Total products per category
+      
         Map<String, Long> productsPerCategory = categories.stream()
                 .collect(Collectors.toMap(
                     Category::getName,
@@ -103,7 +103,7 @@ public class CategoryService {
                 ));
         stats.put("productsPerCategory", productsPerCategory);
         
-        // Categories with active products
+     
         Map<String, Long> activeProductsPerCategory = categories.stream()
                 .collect(Collectors.toMap(
                     Category::getName,
