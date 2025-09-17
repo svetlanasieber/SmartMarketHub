@@ -29,11 +29,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             JwtTokenProvider tokenProvider,
             SecurityProperties securityProperties,
             ObjectMapper objectMapper) {
-        super(authenticationManager); // Spring Security 6 использует этот конструктор
+        super(authenticationManager); 
         this.tokenProvider = tokenProvider;
         this.securityProperties = securityProperties;
         this.objectMapper = objectMapper;
-        setFilterProcessesUrl("/api/auth/login"); // URL для логина
+        setFilterProcessesUrl("/api/auth/login"); 
     }
 
     @Override
