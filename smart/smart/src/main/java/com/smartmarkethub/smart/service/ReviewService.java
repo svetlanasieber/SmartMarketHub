@@ -51,12 +51,12 @@ public class ReviewService {
     public Review createReview(Review review) {
         validateReview(review);
 
-        // Check if product exists
+      
         Product product = productRepository.findById(review.getProduct().getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "id", 
                         review.getProduct().getId()));
 
-        // Check if user already reviewed this product
+    
         if (reviewRepository.existsByUserAndProduct(review.getUser(), product)) {
             throw new InvalidOperationException("User already reviewed this product");
         }
@@ -76,7 +76,7 @@ public class ReviewService {
                 .orElseThrow(() -> new ResourceNotFoundException("Review", "id", 
                         review.getId()));
 
-        // Only the review author can update it
+   
         if (!existingReview.getUser().equals(review.getUser())) {
             throw new InvalidOperationException("User not authorized to update this review");
         }
@@ -95,7 +95,7 @@ public class ReviewService {
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Review", "id", id));
 
-        // Only the review author or an admin can delete it
+
         if (!review.getUser().equals(user) && 
                 !user.getRoles().stream().anyMatch(role -> role.getName().equals("ROLE_ADMIN"))) {
             throw new InvalidOperationException("User not authorized to delete this review");
