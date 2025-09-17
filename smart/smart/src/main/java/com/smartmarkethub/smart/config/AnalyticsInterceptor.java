@@ -48,17 +48,13 @@ public class AnalyticsInterceptor implements HandlerInterceptor {
         logger.debug("Request: {} {} - Status: {} - Time: {}ms", 
                 method, path, status, executeTime);
 
-        // Send analytics data
+       
         sendAnalytics(method, path, status, executeTime);
     }
 
     private void sendAnalytics(String method, String path, int status, long executeTime) {
         if (apiKey != null && endpoint != null) {
-            // Here we would use apiKey and endpoint to send analytics data
-            // This is just a placeholder - in a real implementation, you would:
-            // 1. Create an analytics payload
-            // 2. Send it to the endpoint using a REST client
-            // 3. Handle any errors
+
             logger.debug("Would send analytics to {} with key {}: {} {} (status: {}, time: {}ms)",
                     endpoint, apiKey, method, path, status, executeTime);
         }
