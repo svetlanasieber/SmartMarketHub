@@ -21,10 +21,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Global exception handler for the application.
- * Provides centralized exception handling and consistent error responses.
- */
+
 @RestControllerAdvice
 @ApiResponses(value = {
     @ApiResponse(
