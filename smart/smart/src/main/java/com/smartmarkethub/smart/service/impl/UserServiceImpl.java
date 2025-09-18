@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
     public User createUser(UserCreateRequest request, boolean isAdmin) {
         logger.debug("Creating new user: {}", request.getUsername());
         
-        // Validate unique constraints
+     
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new DuplicateResourceException("User", "username", request.getUsername());
         }
@@ -86,7 +86,7 @@ public class UserServiceImpl implements UserService {
         user.setLastName(request.getLastName());
         user.setIsActive(true);
 
-        // Set roles
+    
         Set<UserRole> roles = new HashSet<>();
         roles.add(roleRepository.findByName("ROLE_USER")
                 .orElseThrow(() -> new IllegalStateException("Default role not found")));
@@ -111,7 +111,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
 
-        // Check if new email is already in use by another user
+     
         userRepository.findByEmail(request.getEmail())
                 .ifPresent(existingUser -> {
                     if (!existingUser.getId().equals(id)) {
@@ -201,7 +201,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
 
-        // Calculate order statistics
+     
         List<Order> orders = new ArrayList<>(user.getOrders());
         BigDecimal totalSpent = orders.stream()
                 .map(Order::getTotalAmount)
@@ -210,7 +210,7 @@ public class UserServiceImpl implements UserService {
         BigDecimal avgOrderValue = orders.isEmpty() ? BigDecimal.ZERO :
                 totalSpent.divide(BigDecimal.valueOf(orders.size()), 2, RoundingMode.HALF_UP);
 
-        // Get favorite categories
+      
         Map<String, Long> categoryCount = orders.stream()
                 .flatMap(order -> order.getOrderItems().stream())
                 .collect(Collectors.groupingBy(
@@ -224,14 +224,14 @@ public class UserServiceImpl implements UserService {
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
 
-        // Get orders by status
+      
         Map<String, Integer> ordersByStatus = orders.stream()
                 .collect(Collectors.groupingBy(
                     Order::getStatus,
                     Collectors.collectingAndThen(Collectors.counting(), Long::intValue)
                 ));
 
-        // Calculate spending by category
+       
         Map<String, BigDecimal> spendingByCategory = orders.stream()
                 .flatMap(order -> order.getOrderItems().stream())
                 .collect(Collectors.groupingBy(
@@ -312,19 +312,19 @@ public class UserServiceImpl implements UserService {
 
         Map<String, Object> metrics = new HashMap<>();
         
-        // Order metrics
+       
         List<Order> orders = new ArrayList<>(user.getOrders());
         metrics.put("totalOrders", orders.size());
         metrics.put("totalSpent", orders.stream()
                 .map(Order::getTotalAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add));
                 
-        // Review metrics
+       
         List<Review> reviews = new ArrayList<>(user.getReviews());
         metrics.put("totalReviews", reviews.size());
         metrics.put("averageRating", calculateAverageRating(reviews));
         
-        // Activity timeline
+      
         metrics.put("activityTimeline", generateActivityTimeline(user));
         
         return metrics;
@@ -340,14 +340,14 @@ public class UserServiceImpl implements UserService {
     private Map<String, List<String>> generateActivityTimeline(User user) {
         Map<String, List<String>> timeline = new TreeMap<>(Collections.reverseOrder());
         
-        // Add orders to timeline
+    
         user.getOrders().forEach(order -> {
             String date = order.getCreatedAt().toLocalDate().toString();
             timeline.computeIfAbsent(date, k -> new ArrayList<>())
                     .add("Placed order #" + order.getId());
         });
         
-        // Add reviews to timeline
+       
         user.getReviews().forEach(review -> {
             String date = review.getCreatedAt().toLocalDate().toString();
             timeline.computeIfAbsent(date, k -> new ArrayList<>())
