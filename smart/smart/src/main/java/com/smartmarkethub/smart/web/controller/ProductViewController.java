@@ -33,10 +33,10 @@ public class ProductViewController {
             @RequestParam(required = false) String sortBy,
             Model model) {
 
-        // Get products
+
         List<Product> products = productService.findProducts(categoryId, minPrice, maxPrice, sortBy);
         
-        // Add to model
+
         model.addAttribute("products", products);
         model.addAttribute("categories", categoryService.findAll());
 
