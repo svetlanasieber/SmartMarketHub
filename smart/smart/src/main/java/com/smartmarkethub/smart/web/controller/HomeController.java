@@ -22,7 +22,7 @@ public class HomeController {
 
     @GetMapping({"/", "/home"})
     public String home(Model model) {
-        // Вземаме първите 4 продукта за featured секцията
+        
         List<Product> featuredProducts = productService.findProducts(null, null, null, "name")
                 .stream()
                 .limit(4)
