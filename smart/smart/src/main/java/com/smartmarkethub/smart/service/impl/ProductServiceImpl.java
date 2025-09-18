@@ -183,10 +183,10 @@ public class ProductServiceImpl implements IProductService {
         List<Product> products = productRepository.findAll();
         Map<String, Object> stats = new HashMap<>();
         
-        // Total products
+     
         stats.put("totalProducts", products.size());
         
-        // Products by category
+      
         Map<String, Long> productsByCategory = products.stream()
                 .collect(Collectors.groupingBy(
                     product -> product.getCategory().getName(),
@@ -194,7 +194,7 @@ public class ProductServiceImpl implements IProductService {
                 ));
         stats.put("productsByCategory", productsByCategory);
         
-        // Stock status
+  
         long outOfStock = products.stream().filter(p -> p.getQuantity() == 0).count();
         long lowStock = products.stream().filter(p -> p.getQuantity() > 0 && p.getQuantity() <= 10).count();
         long inStock = products.stream().filter(p -> p.getQuantity() > 10).count();
@@ -205,7 +205,7 @@ public class ProductServiceImpl implements IProductService {
         stockStatus.put("IN_STOCK", inStock);
         stats.put("stockStatus", stockStatus);
         
-        // Price ranges
+      
         DoubleSummaryStatistics priceStats = products.stream()
                 .map(Product::getPrice)
                 .mapToDouble(BigDecimal::doubleValue)
@@ -223,8 +223,7 @@ public class ProductServiceImpl implements IProductService {
     @Override
     @Transactional(readOnly = true)
     public List<Product> getTrendingProducts(int limit) {
-        // This would typically use sales data or view counts
-        // For now, return products with highest stock turnover
+   
         return productRepository.findAll(Sort.by(Sort.Direction.DESC, "quantity"))
                 .stream()
                 .limit(limit)
@@ -237,7 +236,7 @@ public class ProductServiceImpl implements IProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "id", productId));
                 
-        // For now, return products in the same category
+     
         return productRepository.findByCategory(product.getCategory(), Pageable.ofSize(limit + 1))
                 .stream()
                 .filter(p -> !p.getId().equals(productId))
