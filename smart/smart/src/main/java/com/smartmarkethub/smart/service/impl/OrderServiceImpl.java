@@ -140,7 +140,7 @@ public class OrderServiceImpl implements OrderService {
                     "Cannot cancel order in status: " + order.getStatus());
         }
 
-        // Restore product quantities
+    
         for (OrderItem item : order.getOrderItems()) {
             Product product = item.getProduct();
             product.setQuantity(product.getQuantity() + item.getQuantity());
@@ -160,21 +160,21 @@ public class OrderServiceImpl implements OrderService {
         List<Order> orders = orderRepository.findByDateRange(startDate, endDate);
         Map<String, Object> stats = new HashMap<>();
         
-        // Basic metrics
+     
         stats.put("totalOrders", orders.size());
         BigDecimal totalRevenue = orders.stream()
                 .map(Order::getTotalAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         stats.put("totalRevenue", totalRevenue);
         
-        // Average order value
+      
         if (!orders.isEmpty()) {
             BigDecimal avgOrderValue = totalRevenue
                     .divide(BigDecimal.valueOf(orders.size()), 2, RoundingMode.HALF_UP);
             stats.put("averageOrderValue", avgOrderValue);
         }
         
-        // Orders by status
+    
         Map<String, Long> ordersByStatus = orders.stream()
                 .collect(Collectors.groupingBy(Order::getStatus, Collectors.counting()));
         stats.put("ordersByStatus", ordersByStatus);
@@ -189,7 +189,7 @@ public class OrderServiceImpl implements OrderService {
         
         List<Order> orders = orderRepository.findByDateRange(startDate, endDate);
         
-        // Calculate basic metrics
+      
         BigDecimal totalRevenue = orders.stream()
                 .map(Order::getTotalAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -197,24 +197,24 @@ public class OrderServiceImpl implements OrderService {
         BigDecimal avgOrderValue = orders.isEmpty() ? BigDecimal.ZERO :
                 totalRevenue.divide(BigDecimal.valueOf(orders.size()), 2, RoundingMode.HALF_UP);
                 
-        // Orders by status
+       
         Map<String, Long> ordersByStatus = orders.stream()
                 .collect(Collectors.groupingBy(Order::getStatus, Collectors.counting()));
                 
-        // Revenue by category
+      
         Map<String, BigDecimal> revenueByCategory = calculateRevenueByCategory(orders);
         
-        // Orders by customer
+     
         Map<String, Long> ordersByCustomer = orders.stream()
                 .collect(Collectors.groupingBy(
                     order -> order.getUser().getUsername(),
                     Collectors.counting()
                 ));
                 
-        // Popular products
+      
         Map<String, Integer> popularProducts = calculatePopularProducts(orders);
         
-        // Growth rates
+     
         Map<String, Double> growthRates = calculateGrowthRates(startDate, endDate);
         
         return OrderAnalytics.builder()
@@ -252,11 +252,11 @@ public class OrderServiceImpl implements OrderService {
         List<Order> orders = orderRepository.findByDateRange(startDate, endDate);
         Map<String, Object> trends = new HashMap<>();
         
-        // Time series analysis
+   
         trends.put("ordersByTime", analyzeOrdersByTime(orders, period));
         trends.put("revenueByTime", analyzeRevenueByTime(orders, period));
         
-        // Pattern analysis
+   
         trends.put("popularTimeSlots", analyzePopularTimeSlots(orders));
         trends.put("categoryTrends", analyzeCategoryTrends(orders));
         
@@ -309,7 +309,7 @@ public class OrderServiceImpl implements OrderService {
         Map<String, BigDecimal> revenueByCategory = calculateRevenueByCategory(orders);
         revenue.put("byCategory", revenueByCategory);
         
-        // Calculate percentages
+       
         BigDecimal totalRevenue = revenueByCategory.values().stream()
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
                 
@@ -326,7 +326,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private void validateStatusTransition(String currentStatus, String newStatus) {
-        // Define valid status transitions
+     
         Map<String, List<String>> validTransitions = Map.of(
             "PENDING", List.of("CONFIRMED", "CANCELLED"),
             "CONFIRMED", List.of("SHIPPED", "CANCELLED"),
@@ -366,23 +366,23 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private Map<String, Double> calculateGrowthRates(LocalDateTime startDate, LocalDateTime endDate) {
-        // Calculate the midpoint
+    
         LocalDateTime midpoint = startDate.plus(
                 ChronoUnit.SECONDS.between(startDate, endDate) / 2, ChronoUnit.SECONDS);
         
-        // Get orders for both periods
+    
         List<Order> firstPeriod = orderRepository.findByDateRange(startDate, midpoint);
         List<Order> secondPeriod = orderRepository.findByDateRange(midpoint, endDate);
         
         Map<String, Double> growthRates = new HashMap<>();
         
-        // Calculate order count growth
+       
         double orderGrowth = calculateGrowthRate(
                 firstPeriod.size(), 
                 secondPeriod.size());
         growthRates.put("orders", orderGrowth);
         
-        // Calculate revenue growth
+     
         BigDecimal firstPeriodRevenue = calculateTotalRevenue(firstPeriod);
         BigDecimal secondPeriodRevenue = calculateTotalRevenue(secondPeriod);
         double revenueGrowth = calculateGrowthRate(
@@ -394,7 +394,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private double calculateGrowthRate(double oldValue, double newValue) {
-        if (oldValue == 0) return 100.0; // Handle division by zero
+        if (oldValue == 0) return 100.0; 
         return ((newValue - oldValue) / oldValue) * 100.0;
     }
 
